@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - College Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user-plus"></i> Register
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="registerForm">
+                        {% csrf_token %}
+
+                        <!-- Role Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-user-check"></i> Register as
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="role-selection">
+                                {% for value, label in form.role.field.choices %}
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" 
+                                           id="id_role_{{ forloop.counter }}" 
+                                           name="role" 
+                                           value="{{ value }}"
+                                           onchange="toggleRegistrationFields(this.value)"
+                                           {% if form.role.value == value %}checked{% endif %}>
+                                    <label class="form-check-label" for="id_role_{{ forloop.counter }}">
+                                        {% if value == 'student' %}
+                                            <i class="fas fa-graduation-cap"></i> {{ label }}
+                                        {% else %}
+                                            <i class="fas fa-chalkboard-user"></i> {{ label }}
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.role.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {{ form.role.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Student-specific Fields -->
+                        <div id="studentFields" style="display: none;">
+                            <!-- Hall Ticket ID -->
+                            <div class="mb-3">
+                                <label for="{{ form.hall_ticket_id.id_for_label }}" class="form-label">
+                                    Hall Ticket ID <span class="text-danger">*</span>
+                                </label>
+                                {{ form.hall_ticket_id }}
+                                {% if form.hall_ticket_id.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.hall_ticket_id.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Name -->
+                            <div class="mb-3">
+                                <label for="{{ form.student_name.id_for_label }}" class="form-label">
+                                    Full Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.student_name }}
+                                {% if form.student_name.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.student_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Branch -->
+                            <div class="mb-3">
+                                <label for="{{ form.student_branch.id_for_label }}" class="form-label">
+                                    Branch <span class="text-danger">*</span>
+                                </label>
+                                {{ form.student_branch }}
+                                {% if form.student_branch.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.student_branch.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Year -->
+                            <div class="mb-3">
+                                <label for="{{ form.student_year.id_for_label }}" class="form-label">
+                                    Year <span class="text-danger">*</span>
+                                </label>
+                                {{ form.student_year }}
+                                {% if form.student_year.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.student_year.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Faculty-specific Fields -->
+                        <div id="facultyFields" style="display: none;">
+                            <!-- Username -->
+                            <div class="mb-3">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">
+                                    Username <span class="text-danger">*</span>
+                                </label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.username.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Name -->
+                            <div class="mb-3">
+                                <label for="{{ form.faculty_name.id_for_label }}" class="form-label">
+                                    Full Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.faculty_name }}
+                                {% if form.faculty_name.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.faculty_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Subject -->
+                            <div class="mb-3">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">
+                                    Subject <span class="text-danger">*</span>
+                                </label>
+                                {{ form.subject }}
+                                {% if form.subject.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.subject.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Branch -->
+                            <div class="mb-3">
+                                <label for="{{ form.faculty_branch.id_for_label }}" class="form-label">
+                                    Branch <span class="text-danger">*</span>
+                                </label>
+                                {{ form.faculty_branch }}
+                                {% if form.faculty_branch.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.faculty_branch.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Year -->
+                            <div class="mb-3">
+                                <label for="{{ form.faculty_year.id_for_label }}" class="form-label">
+                                    Year <span class="text-danger">*</span>
+                                </label>
+                                {{ form.faculty_year }}
+                                {% if form.faculty_year.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ form.faculty_year.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Password Fields (Common) -->
+                        <div class="mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                Password <span class="text-danger">*</span>
+                            </label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {{ form.password1.errors }}
+                            </div>
+                            {% endif %}
+                            <small class="form-text text-muted">At least 8 characters long</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                Confirm Password <span class="text-danger">*</span>
+                            </label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {{ form.password2.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- General Error Messages -->
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-user-plus"></i> Register
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Links -->
+                    <hr class="my-4">
+                    <p class="text-center text-muted">
+                        Already have an account? 
+                        <a href="{% url 'login' %}" class="text-decoration-none fw-bold">Login here</a>
+                    </p>
+                    <p class="text-center text-muted">
+                        <a href="{% url 'home' %}" class="text-decoration-none">Back to home</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleRegistrationFields(role) {
+    const studentFields = document.getElementById('studentFields');
+    const facultyFields = document.getElementById('facultyFields');
+    
+    // Clear all fields to prevent form submission of hidden fields
+    if (role === 'student') {
+        studentFields.style.display = 'block';
+        facultyFields.style.display = 'none';
+        // Clear faculty fields
+        document.querySelector('input[name="username"]').value = '';
+        document.querySelector('input[name="faculty_name"]').value = '';
+        document.querySelector('input[name="subject"]').value = '';
+    } else {
+        studentFields.style.display = 'none';
+        facultyFields.style.display = 'block';
+        // Clear student fields
+        document.querySelector('input[name="hall_ticket_id"]').value = '';
+        document.querySelector('input[name="student_name"]').value = '';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const selectedRole = document.querySelector('input[name="role"]:checked');
+    if (selectedRole) {
+        toggleRegistrationFields(selectedRole.value);
+    } else {
+        // Default to student
+        toggleRegistrationFields('student');
+    }
+});
+</script>
+
+<style>
+    .role-selection {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .form-check {
+        padding: 10px 15px;
+        border: 2px solid #dee2e6;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-check:hover {
+        border-color: #28a745;
+        background-color: #f8f9fa;
+    }
+    
+    .form-check input:checked ~ label {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .form-check input:checked {
+        accent-color: #28a745;
+    }
+</style>
+{% endblock %}

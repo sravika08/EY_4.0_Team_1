@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty Dashboard - College Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 style="color: #2c3e50;">
+                <i class="fas fa-chalkboard-user"></i> Welcome, Prof. {{ faculty.name }}!
+            </h2>
+            <p class="text-muted">
+                <strong>Subject:</strong> {{ faculty.subject }} | 
+                <strong>Branch:</strong> {{ faculty.get_branch_display }} | 
+                <strong>Year:</strong> {{ faculty.get_year_display }}
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'create_schedule' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Schedule
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-box">
+                <div class="stat-value">{{ total_students_in_batch }}</div>
+                <div class="stat-label">Students in Batch</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box">
+                <div class="stat-value">{{ recent_schedules|length }}</div>
+                <div class="stat-label">Recent Classes</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box">
+                <div class="stat-value">{{ faculty.branch }}</div>
+                <div class="stat-label">Teaching Branch</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Schedules Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-alt"></i> Recent Class Schedules (Last 5)
+                </div>
+                {% if recent_schedules %}
+                <div class="list-group list-group-flush">
+                    {% for schedule in recent_schedules %}
+                    <a href="{% url 'mark_attendance' schedule.id %}" class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="fas fa-book"></i> {{ schedule.subject }}
+                                </h6>
+                                <p class="mb-1 text-muted small">{{ schedule.topic }}</p>
+                                <p class="mb-0 small">
+                                    <i class="fas fa-calendar"></i> 
+                                    {{ schedule.date|date:"d/m/Y (l)" }}
+                                </p>
+                            </div>
+                            <span class="badge badge-primary">
+                                Mark Attendance
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'view_all_schedules' %}" class="text-decoration-none">
+                        View All Schedules <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                {% else %}
+                <div class="card-body">
+                    <div class="alert alert-info mb-0" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        No schedules created yet. 
+                        <a href="{% url 'create_schedule' %}" class="alert-link">Create one now</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-tasks"></i> Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'create_schedule' %}" class="btn btn-outline-primary text-start">
+                            <i class="fas fa-plus-circle"></i> Create New Class Schedule
+                        </a>
+                        <a href="{% url 'view_all_schedules' %}" class="btn btn-outline-primary text-start">
+                            <i class="fas fa-calendar-check"></i> View All Schedules
+                        </a>
+                        <a href="{% url 'view_student_list' %}" class="btn btn-outline-primary text-start">
+                            <i class="fas fa-users"></i> View Student List & Attendance
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> System Information
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Faculty Name:</strong> {{ faculty.name }}
+                    </p>
+                    <p class="mb-2">
+                        <strong>Subject:</strong> {{ faculty.subject }}
+                    </p>
+                    <p class="mb-2">
+                        <strong>Branch-Year:</strong> {{ faculty.get_branch_display }} - {{ faculty.get_year_display }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Total Students:</strong> {{ total_students_in_batch }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Attendance Summary -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar"></i> Student Attendance Summary
+                </div>
+                {% if student_summaries %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Hall Ticket ID</th>
+                                <th>Student Name</th>
+                                <th>Total Classes</th>
+                                <th>Attended</th>
+                                <th>Absent</th>
+                                <th>Percentage</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for summary in student_summaries %}
+                            <tr>
+                                <td><strong>{{ summary.student.hall_ticket_id }}</strong></td>
+                                <td>{{ summary.student.name }}</td>
+                                <td>{{ summary.total_classes }}</td>
+                                <td><span class="badge badge-success">{{ summary.attended_classes }}</span></td>
+                                <td>
+                                    <span class="badge badge-danger">
+                                        {{ summary.absent_classes }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>{{ summary.percentage }}%</strong>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             data-width="{{ summary.percentage }}" 
+                                             aria-valuenow="{{ summary.percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </td>
+                                <script>
+                                (function() { var el = document.querySelector('[data-width="{{ summary.percentage }}"]'); if(el) el.style.width = el.getAttribute('data-width') + '%'; })();
+                                </script>
+                                <td>
+                                    {% if summary.percentage >= 75 %}
+                                    <span class="badge badge-success">Good</span>
+                                    {% elif summary.percentage >= 50 %}
+                                    <span class="badge badge-warning">At Risk</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">Critical</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="card-body">
+                    <div class="alert alert-info mb-0" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        No student data available yet. Create a schedule and mark attendance to see student statistics.
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge-primary {
+        background-color: #3498db;
+        color: white;
+    }
+    .badge-success {
+        background-color: #27ae60;
+        color: white;
+    }
+    .badge-danger {
+        background-color: #e74c3c;
+        color: white;
+    }
+    .badge-warning {
+        background-color: #f39c12;
+        color: white;
+    }
+    
+    .list-group-item-action {
+        transition: all 0.3s ease;
+    }
+    
+    .list-group-item-action:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

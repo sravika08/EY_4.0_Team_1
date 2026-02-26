@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}Student List - College Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 style="color: #2c3e50;">
+                <i class="fas fa-users"></i> Student List & Attendance
+            </h2>
+            <p class="text-muted">View students in your batch and their attendance records</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'faculty_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Batch Info -->
+    <div class="alert alert-info" role="alert">
+        <strong>Faculty:</strong> {{ faculty.name }} | 
+        <strong>Branch:</strong> {{ faculty.get_branch_display }} | 
+        <strong>Year:</strong> {{ faculty.get_year_display }} | 
+        <strong>Total Students:</strong> {{ student_data|length }}
+    </div>
+
+    <!-- Students Table -->
+    {% if student_data %}
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-table"></i> Student Attendance Summary ({{ student_data|length }} Students)
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 15%;">Hall Ticket ID</th>
+                        <th style="width: 30%;">Student Name</th>
+                        <th style="width: 10%;">Total Classes</th>
+                        <th style="width: 12%;">Attended</th>
+                        <th style="width: 12%;">Absent</th>
+                        <th style="width: 16%;">Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in student_data %}
+                    <tr>
+                        <td><strong>{{ forloop.counter }}</strong></td>
+                        <td><strong>{{ item.student.hall_ticket_id }}</strong></td>
+                        <td>{{ item.student.name }}</td>
+                        <td>
+                            <span class="badge badge-primary">
+                                {{ item.total_classes }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge badge-success">
+                                {{ item.attended_classes }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge badge-danger">
+                                {{ item.absent_classes }}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="width: 100%;">
+                                <strong>{{ item.percentage }}%</strong>
+                                <div class="progress mt-1" style="height: 8px;">
+                                    <div class="progress-bar {% if item.percentage >= 75 %}bg-success{% elif item.percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                         role="progressbar" 
+                                         data-width="{{ item.percentage }}" 
+                                         aria-valuenow="{{ item.percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <script>
+                                (function() { var el = document.querySelector('[data-width="{{ item.percentage }}"]'); if(el) el.style.width = el.getAttribute('data-width') + '%'; })();
+                                </script>
+                                <small class="text-muted">
+                                    {% if item.percentage >= 75 %}
+                                    <i class="fas fa-check-circle text-success"></i> Good
+                                    {% elif item.percentage >= 50 %}
+                                    <i class="fas fa-exclamation-circle text-warning"></i> At Risk
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-danger"></i> Critical
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Statistics Footer -->
+        <div class="card-footer">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <small class="text-muted">Total Students</small><br>
+                    <strong style="font-size: 1.3rem;">{{ student_data|length }}</strong>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted">Average Attendance</small><br>
+                    <strong style="font-size: 1.3rem; color: #27ae60;">
+                        {% with total_attended=0 total_classes=0 %}
+                            {% for item in student_data %}
+                                {% with total_classes|add:item.total_classes as total_classes %}
+                                    {% with total_attended|add:item.attended_classes as total_attended %}
+                                    {% endwith %}
+                                {% endwith %}
+                            {% endfor %}
+                            {{ total_attended|add:total_classes|add:total_classes|add:'-'|add:total_attended }}%
+                        {% endwith %}
+                    </strong>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted">Students (75%+)</small><br>
+                    <strong style="font-size: 1.3rem; color: var(--success-color);">
+                        {% with good_count=0 %}
+                            {% for item in student_data %}
+                                {% if item.percentage >= 75 %}
+                                    
+                                {% endif %}
+                            {% endfor %}
+                            0
+                        {% endwith %}
+                    </strong>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted">Students (<75%)</small><br>
+                    <strong style="font-size: 1.3rem; color: #e74c3c;">
+                        {% with risk_count=0 %}
+                            {% for item in student_data %}
+                                {% if item.percentage < 75 %}
+                                    
+                                {% endif %}
+                            {% endfor %}
+                            0
+                        {% endwith %}
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="alert alert-light border mt-4" role="alert">
+        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Attendance Status Legend</h6>
+        <div class="row">
+            <div class="col-md-4">
+                <p class="mb-0">
+                    <span class="badge bg-success">Good</span> - 75% or above (Meeting requirements)
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="mb-0">
+                    <span class="badge bg-warning">At Risk</span> - 50% to 75% (Needs improvement)
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="mb-0">
+                    <span class="badge bg-danger">Critical</span> - Below 50% (At risk of failing)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>No students found</strong> in your batch ({{ faculty.get_branch_display }} - {{ faculty.get_year_display }}).
+    </div>
+    {% endif %}
+
+    <!-- Additional Options -->
+    <div class="row mt-4 g-3">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-plus"></i> Create Schedule
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">Create a new class schedule and mark student attendance.</p>
+                    <a href="{% url 'create_schedule' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Create Schedule
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-list"></i> View Schedules
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">View all class schedules and mark attendance.</p>
+                    <a href="{% url 'view_all_schedules' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-list"></i> View Schedules
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge-primary {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .badge-success {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .badge-danger {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .bg-success {
+        background-color: #27ae60 !important;
+    }
+    
+    .bg-warning {
+        background-color: #f39c12 !important;
+        color: white !important;
+    }
+    
+    .bg-danger {
+        background-color: #e74c3c !important;
+    }
+</style>
+{% endblock %}

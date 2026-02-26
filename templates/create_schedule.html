@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Class Schedule - College Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 style="color: #2c3e50;">
+                <i class="fas fa-calendar-plus"></i> Create Class Schedule
+            </h2>
+            <p class="text-muted">Create a new class schedule to track student attendance</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'faculty_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Faculty Info -->
+    <div class="alert alert-info" role="alert">
+        <strong>Faculty:</strong> {{ faculty.name }} | 
+        <strong>Subject:</strong> {{ faculty.subject }} | 
+        <strong>Branch-Year:</strong> {{ faculty.get_branch_display }} - {{ faculty.get_year_display }}
+    </div>
+
+    <!-- Schedule Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-edit"></i> Schedule Details
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <!-- Date Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">
+                                Class Date <span class="text-danger">*</span>
+                            </label>
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {{ form.date.errors }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i>
+                                Select the date when this class will be held.
+                            </small>
+                        </div>
+
+                        <!-- Subject Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label">
+                                Subject <span class="text-danger">*</span>
+                            </label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {{ form.subject.errors }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i>
+                                Enter the subject name (e.g., Data Structures, Web Development)
+                            </small>
+                        </div>
+
+                        <!-- Topic Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.topic.id_for_label }}" class="form-label">
+                                Topic <span class="text-danger">*</span>
+                            </label>
+                            {{ form.topic }}
+                            {% if form.topic.errors %}
+                            <div class="alert alert-danger mt-2" role="alert">
+                                {{ form.topic.errors }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-info-circle"></i>
+                                Enter the specific topic to be covered in this class (e.g., Arrays and Linked Lists)
+                            </small>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                                <i class="fas fa-save"></i> Create Schedule
+                            </button>
+                            <a href="{% url 'faculty_dashboard' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-question-circle"></i> How to Create a Schedule
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li class="mb-2">
+                            <strong>Select Date:</strong> Choose the date when the class will be held. 
+                            You can schedule classes in advance.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Enter Subject:</strong> Provide the subject name (e.g., Mathematics, Physics, Chemistry).
+                        </li>
+                        <li class="mb-2">
+                            <strong>Add Topic:</strong> specify the topic to be covered (e.g., Chapter 5: Derivatives).
+                        </li>
+                        <li>
+                            <strong>Submit:</strong> Click "Create Schedule" to save the class schedule. 
+                            Once created, you can mark attendance for the scheduled class.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Additional Tips -->
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-lightbulb"></i> Tips
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li class="mb-2">Schedule classes well in advance to help students plan</li>
+                        <li class="mb-2">Be specific with topic names for better record keeping</li>
+                        <li class="mb-2">You can edit or cancel schedules if needed</li>
+                        <li class="mb-0">After creating a schedule, you can mark attendance immediately or later</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}All Schedules - College Attendance Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 style="color: #2c3e50;">
+                <i class="fas fa-calendar-list"></i> All Class Schedules
+            </h2>
+            <p class="text-muted">Manage all your class schedules and attendance</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'create_schedule' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create New Schedule
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters/Info -->
+    <div class="alert alert-info" role="alert">
+        <strong>Faculty:</strong> {{ faculty.name }} | 
+        <strong>Subject:</strong> {{ faculty.subject }} | 
+        <strong>Total Schedules:</strong> {{ schedules|length }}
+    </div>
+
+    <!-- Schedules List -->
+    {% if schedules %}
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-list"></i> Class Schedule List
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Subject</th>
+                        <th>Topic</th>
+                        <th>Attendance Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr>
+                        <td><strong>{{ forloop.counter }}</strong></td>
+                        <td>
+                            <strong>{{ schedule.date|date:"d/m/Y" }}</strong><br>
+                            <small class="text-muted">{{ schedule.date|date:"l" }}</small>
+                        </td>
+                        <td>{{ schedule.subject }}</td>
+                        <td>{{ schedule.topic }}</td>
+                        <td>
+                            <!-- Check if attendance is marked -->
+                            {% if schedule.attendances.all|length > 0 %}
+                            <span class="badge badge-success">
+                                <i class="fas fa-check-circle"></i> Marked
+                            </span>
+                            <br>
+                            <small class="text-muted">
+                                {{ schedule.attendances.all|length }} records
+                            </small>
+                            {% else %}
+                            <span class="badge badge-warning">
+                                <i class="fas fa-exclamation-circle"></i> Pending
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'mark_attendance' schedule.id %}" 
+                               class="btn btn-sm btn-primary" 
+                               title="Mark or Update Attendance">
+                                <i class="fas fa-edit"></i> Mark
+                            </a>
+                            <button class="btn btn-sm btn-danger" 
+                                    data-schedule-id="{{ schedule.id }}"
+                                    onclick="deleteSchedule(this.getAttribute('data-schedule-id'))"
+                                    title="Delete Schedule">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted">
+            <small>
+                <i class="fas fa-info-circle"></i>
+                Click "Mark" to record attendance or update existing records. 
+                "Delete" will remove the schedule and all associated attendance records.
+            </small>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>No schedules found.</strong> 
+        <a href="{% url 'create_schedule' %}" class="alert-link">Create your first schedule</a>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="mt-4">
+        <a href="{% url 'faculty_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<script>
+    // Delete schedule confirmation
+    function deleteSchedule(scheduleId) {
+        if (confirm('Are you sure you want to delete this schedule? This will also remove all attendance records for this class.')) {
+            // In a production app, you would send a DELETE request here
+            // For now, this is a placeholder
+            alert('Delete functionality would be implemented in production.');
+        }
+    }
+</script>
+
+<style>
+    .badge {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .badge-success {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .badge-warning {
+        background-color: #f39c12;
+        color: white;
+    }
+</style>
+{% endblock %}

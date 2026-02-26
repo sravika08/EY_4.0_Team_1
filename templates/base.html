@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}College Attendance Management System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f1;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation styling */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        /* Main content area */
+        main {
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0;
+        }
+
+        .container-custom {
+            max-width: 1000px;
+        }
+
+        /* Card styling */
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 8px 8px 0 0;
+            padding: 1.5rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1f618d);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border: none;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border: none;
+        }
+
+        /* Form styling */
+        .form-control, .form-select {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0.75rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Alert styling */
+        .alert {
+            border: none;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* Badge styling */
+        .badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .badge-primary {
+            background-color: var(--secondary-color);
+        }
+
+        .badge-success {
+            background-color: var(--success-color);
+        }
+
+        .badge-danger {
+            background-color: var(--danger-color);
+        }
+
+        .badge-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        /* Table styling */
+        .table {
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Dashboard stats */
+        .stat-box {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Attendance percentage indicator */
+        .percentage-indicator {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .percentage-good {
+            background-color: #d4edda;
+            color: var(--success-color);
+        }
+
+        .percentage-warning {
+            background-color: #fff3cd;
+            color: var(--warning-color);
+        }
+
+        .percentage-danger {
+            background-color: #f8d7da;
+            color: var(--danger-color);
+        }
+
+        /* Footer styling */
+        footer {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Progress bar */
+        .progress {
+            height: 1.5rem;
+            border-radius: 6px;
+            background-color: #eee;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--secondary-color), #2980b9);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <!-- Navbar for authenticated users -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-graduation-cap"></i> Attendance System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user|add:'student_profile' %}
+                        <!-- Student Navigation -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'student_dashboard' %}">
+                                <i class="fas fa-chart-pie"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'student_attendance_details' %}">
+                                <i class="fas fa-list"></i> My Attendance
+                            </a>
+                        </li>
+                    {% elif user|add:'faculty_profile' %}
+                        <!-- Faculty Navigation -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'faculty_dashboard' %}">
+                                <i class="fas fa-chart-pie"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'create_schedule' %}">
+                                <i class="fas fa-plus"></i> Create Schedule
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'view_all_schedules' %}">
+                                <i class="fas fa-calendar"></i> Schedules
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'view_student_list' %}">
+                                <i class="fas fa-users"></i> Students
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container-fluid mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024-2026 College Attendance Management System. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
